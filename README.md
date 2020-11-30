@@ -1,1 +1,46 @@
 # Likvido.Robots
+Library which helps with running simple tasks with telemetry and logging
+
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/likvido/Likvido.Robots/Publish%20to%20nuget)](https://github.com/Likvido/Likvido.Robots/actions?query=workflow%3A%22Publish+to+nuget%22)
+[![Nuget](https://img.shields.io/nuget/v/Likvido.Robots)](https://www.nuget.org/packages/Likvido.Robots/)
+# Usage
+## An async execution
+```
+await new Robot("Name")
+    .BuildOperation("operation")
+    .SetConfigureServices((configuration, services) => { })
+    .SetOnServiceProviderBuild(sp => { })
+    .SetFunc(c => Task.CompletedTask)
+    .SetPostExecute(() => Task.CompletedTask)
+    .Run();
+```
+## A sync execution
+```
+new Robot("Name")
+    .BuildOperation("operation")
+    .SetConfigureServices((configuration, services) => { })
+    .SetOnServiceProviderBuild(sp => { })
+    .SetFunc(c => { })
+    .SetPostExecute(() => { })
+    .Run();
+```
+## An async reusable operation
+```
+Func<Task> func = new Robot("Name")
+    .BuildOperation("operation")
+    .SetConfigureServices((configuration, services) => { })
+    .SetOnServiceProviderBuild(sp => { })
+    .SetFunc(c => Task.CompletedTask)
+    .SetPostExecute(() => Task.CompletedTask)
+    .Build();
+```
+## A sync reusable operation
+```
+Action func = new Robot("Name")
+    .BuildOperation("operation")
+    .SetConfigureServices((configuration, services) => { })
+    .SetOnServiceProviderBuild(sp => { })
+    .SetFunc(c => { })
+    .SetPostExecute(() => {})
+    .Build();
+```
