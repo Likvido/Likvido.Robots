@@ -19,7 +19,7 @@ namespace Likvido.Robots
         {
             if (disposedValue)
             {
-                throw new InvalidOperationException("The object already dispossed");
+                throw new InvalidOperationException("The object has already been dispossed");
             }
             _action();
         }
