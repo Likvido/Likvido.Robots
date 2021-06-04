@@ -2,7 +2,7 @@
 
 namespace Likvido.Robots
 {
-    public class Operation : IDisposable
+    public sealed class Operation : IDisposable
     {
         private readonly Action _action;
         private bool disposedValue;
@@ -62,5 +62,4 @@ namespace Likvido.Robots
             GC.SuppressFinalize(this);
         }
     }
-
 }

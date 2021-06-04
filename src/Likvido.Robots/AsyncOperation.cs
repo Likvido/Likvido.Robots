@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Likvido.Robots
 {
-    public class AsyncOperation : IAsyncDisposable
+    public sealed class AsyncOperation : IAsyncDisposable
     {
         private readonly Func<Task> _action;
         private Func<ValueTask>? _disposeAction;
