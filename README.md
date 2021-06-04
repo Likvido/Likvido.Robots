@@ -25,7 +25,7 @@ new Robot("Name")
 ```
 ## An async reusable operation
 ```
-Func<Task> func = new Robot("Name")
+AsyncOperation asyncOperation = new Robot("Name")
     .BuildOperation("operation")
     .SetConfigureServices((configuration, services) => { })
     .SetOnServiceProviderBuild(sp => { })
@@ -35,7 +35,7 @@ Func<Task> func = new Robot("Name")
 ```
 ## A sync reusable operation
 ```
-Action func = new Robot("Name")
+Operation operation = new Robot("Name")
     .BuildOperation("operation")
     .SetConfigureServices((configuration, services) => { })
     .SetOnServiceProviderBuild(sp => { })
