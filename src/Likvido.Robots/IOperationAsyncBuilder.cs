@@ -5,7 +5,7 @@ namespace Likvido.Robots
 {
     public interface IOperationAsyncBuilder : IOperationBuilder
     {
-        Func<Task> Build();
+        AsyncOperation Build();
         Task Run();
     }
 }

@@ -4,7 +4,7 @@ namespace Likvido.Robots
 {
     public interface IOperationSyncBuilder : IOperationBuilder
     {
-        Action Build();
+        Operation Build();
         void Run();
     }
 }

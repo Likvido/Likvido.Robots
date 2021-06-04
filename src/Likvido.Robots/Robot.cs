@@ -2,7 +2,7 @@
 
 namespace Likvido.Robots
 {
-    public delegate void ReportError(string message, Exception e);
+    public delegate void ReportError(IServiceProvider serviceProvider, string message, Exception e);
 
     public class Robot
     {
