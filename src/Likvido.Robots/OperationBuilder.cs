@@ -17,10 +17,11 @@ namespace Likvido.Robots
 
         void IOperationSyncBuilder.Run()
         {
-            ((IOperationSyncBuilder)this).Build().Invoke();
+            using var operation = ((IOperationSyncBuilder)this).Build();
+            operation.Run();
         }
 
-        Action IOperationSyncBuilder.Build()
+        Operation IOperationSyncBuilder.Build()
         {
             OperationDetails.AsyncFunc = sp => 
             {
@@ -37,45 +38,54 @@ namespace Likvido.Robots
                 };
             }
 
-             var func = ((IOperationAsyncBuilder)this).Build();
-            return () => func().GetAwaiter().GetResult();
+            var (func, _, dispose) = Build();
+            return new Operation(() => func().GetAwaiter().GetResult(), dispose);
         }
 
         async Task IOperationAsyncBuilder.Run()
         {
-            await ((IOperationAsyncBuilder)this).Build().Invoke().ConfigureAwait(false);
+            await using var operation = ((IOperationAsyncBuilder)this).Build();
+            await operation.Run().ConfigureAwait(false);
         }
 
-        Func<Task> IOperationAsyncBuilder.Build()
+        AsyncOperation IOperationAsyncBuilder.Build()
+        {
+            var (func, asyncDispose, _) = Build();
+            return new AsyncOperation(func, asyncDispose);
+        }
+
+        private (Func<Task> Func, Func<ValueTask> AsyncDispose, Action Dispose) Build()
         {
             var serviceProvider = OperationDetails.BuildServiceProvider();
-
-            return async () =>
-            {
-                using var scope = serviceProvider.CreateScope();
-                var services = scope.ServiceProvider;
-                var telemetryClient = services.GetRequiredService<TelemetryClient>();
-                Func<Task> func = async () =>
+            return (async () =>
                 {
-                    try
+                    using var scope = serviceProvider.CreateScope();
+                    var services = scope.ServiceProvider;
+                    var telemetryClient = services.GetRequiredService<TelemetryClient>();
+                    Func<Task> func = async () =>
                     {
-                        await OperationDetails.AsyncFunc!(services).ConfigureAwait(false);
-                    }
-                    catch (Exception e)
+                        try
+                        {
+                            await OperationDetails.AsyncFunc!(services).ConfigureAwait(false);
+                        }
+                        catch (Exception e)
+                        {
+                            OperationDetails.ReportError?
+                                .Invoke(services, $"Job run failed. Robot - {OperationDetails.Role}, operation - {OperationDetails.Name}", e);
+                            throw;
+                        }
+                    };
+                    var requestOptions = new ExecuteAsRequestAsyncOptions(OperationDetails.Name, func)
                     {
-                        OperationDetails.ReportError?.Invoke($"Job run failed. Robot - {OperationDetails.Role}, operation - {OperationDetails.Name}", e);
-                        throw;
-                    }
-                };
-                var requestOptions = new ExecuteAsRequestAsyncOptions(OperationDetails.Name, func)
-                {
-                    FlushWait = OperationDetails.FlushWait,
-                    Configure = OperationDetails.ConfigureRequestTelemetry,
-                    PostExecute = OperationDetails.AsyncPostExecute
-                };
+                        FlushWait = OperationDetails.FlushWait,
+                        Configure = OperationDetails.ConfigureRequestTelemetry,
+                        PostExecute = OperationDetails.AsyncPostExecute
+                    };
 
-                await telemetryClient.ExecuteAsRequestAsync(requestOptions).ConfigureAwait(false);
-            };
+                    await telemetryClient.ExecuteAsRequestAsync(requestOptions).ConfigureAwait(false);
+                },
+                serviceProvider.DisposeAsync,
+                serviceProvider.Dispose);
         }
     }
 }

@@ -54,6 +54,25 @@ namespace Likvido.Robots
         /// <param name="builder"></param>
         /// <param name="reportError"></param>
         /// <returns></returns>
+        public static T SetReportError<T>(this T builder, Action<string, Exception> reportError)
+            where T : IOperationBuilder
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            builder.OperationDetails.ReportError = (_, message, ex) => reportError?.Invoke(message, ex);
+            return builder;
+        }
+
+        /// <summary>
+        /// Specifies callback to be called when an error occurs
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="builder"></param>
+        /// <param name="reportError"></param>
+        /// <returns></returns>
         public static T SetReportError<T>(this T builder, ReportError reportError)
             where T : IOperationBuilder
         {
