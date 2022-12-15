@@ -15,7 +15,7 @@
   <Import Project="$(ProjectDir)../version.props" />
 
   <ItemGroup>
-    <PackageReference Include="Likvido.ApplicationInsights.Telemetry" Version="1.1.0" />
+    <PackageReference Include="Likvido.ApplicationInsights.Telemetry" Version="1.2.1" />
     <PackageReference Include="Likvido.Configurations" Version="1.2.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.21.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.1">
