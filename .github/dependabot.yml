@@ -5,6 +5,6 @@ updates:
     schedule:
       interval: daily
   - package-ecosystem: nuget
-    directory: /src/Likvido.Robots
+    directory: /
     schedule:
       interval: daily
